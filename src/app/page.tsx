@@ -1,101 +1,146 @@
-import Image from "next/image";
+'use client'
 
-export default function Home() {
+import { useState, useEffect } from 'react'
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Progress } from "@/components/ui/progress"
+import { Star } from 'lucide-react'
+
+
+
+// Simulated product data
+const products = [
+  { id: 1, name: "Laptop", price: 999.99, image: "/placeholder.svg?height=200&width=200" },
+  { id: 2, name: "Smartphone", price: 599.99, image: "/placeholder.svg?height=200&width=200" },
+  { id: 3, name: "Headphones", price: 149.99, image: "/placeholder.svg?height=200&width=200" },
+  { id: 4, name: "Smartwatch", price: 249.99, image: "/placeholder.svg?height=200&width=200" },
+]
+
+type Product = typeof products[0]
+
+type Screen = 'products' | 'detail' | 'purchase' | 'rating' | 'confirmation'
+
+export default function App() {
+  const [currentScreen, setCurrentScreen] = useState<Screen>('products')
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
+  const [purchaseProgress, setPurchaseProgress] = useState(0)
+  const [rating, setRating] = useState(0)
+
+  
+  const selectProduct = (product: Product) => {
+    setSelectedProduct(product)
+    setCurrentScreen('detail')
+  }
+
+  const startPurchase = () => {
+    setCurrentScreen('purchase')
+    setPurchaseProgress(0)
+  }
+
+  const handleRating = async (value: number) => {
+    setRating(value)
+    // Here you would typically call your blockchain function
+    // For this example, we'll just simulate a delay
+    await new Promise(resolve => setTimeout(resolve, 1000))
+    setCurrentScreen('confirmation')
+  }
+
+
+  useEffect(() => {
+    if (currentScreen === 'purchase') {
+      const timer = setInterval(() => {
+        setPurchaseProgress((oldProgress) => {
+          const newProgress = oldProgress + 10
+          if (newProgress === 100) {
+            clearInterval(timer)
+            setTimeout(() => setCurrentScreen('rating'), 500)
+          }
+          return newProgress
+        })
+      }, 500)
+
+      return () => clearInterval(timer)
+    }
+  }, [currentScreen])
+
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="https://nextjs.org/icons/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
-
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="https://nextjs.org/icons/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+    <div className="container mx-auto p-4">
+      {currentScreen === 'products' && (
+        <div>
+          <h1 className="text-2xl font-bold mb-4">Our Products</h1>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {products.map((product) => (
+              <Card key={product.id} className="flex flex-col justify-between">
+                <CardHeader>
+                  <CardTitle>{product.name}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <img src={product.image} alt={product.name} className="w-full h-48 object-cover mb-2" />
+                  <p className="text-lg font-semibold">${product.price.toFixed(2)}</p>
+                </CardContent>
+                <CardFooter>
+                  <Button onClick={() => selectProduct(product)}>View Details</Button>
+                </CardFooter>
+              </Card>
+            ))}
+          </div>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+      )}
+      {currentScreen === 'detail' && selectedProduct && (
+        <div>
+          <Button onClick={() => setCurrentScreen('products')} className="mb-4">Back to Products</Button>
+          <Card>
+            <CardHeader>
+              <CardTitle>{selectedProduct.name}</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <img src={selectedProduct.image} alt={selectedProduct.name} className="w-full h-64 object-cover mb-4" />
+              <p className="text-xl font-semibold mb-2">${selectedProduct.price.toFixed(2)}</p>
+              <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+            </CardContent>
+            <CardFooter>
+              <Button onClick={startPurchase}>Buy Now</Button>
+            </CardFooter>
+          </Card>
+        </div>
+      )}
+            {currentScreen === 'purchase' && selectedProduct && (
+        <div className="flex flex-col items-center justify-center h-screen">
+          <h2 className="text-2xl font-bold mb-4">Processing Your Purchase</h2>
+          <Progress value={purchaseProgress} className="w-64 mb-4" />
+          <p>{purchaseProgress === 100 ? 'Purchase Complete!' : 'Please wait...'}</p>
+        </div>
+      )}
+        {currentScreen === 'rating' && selectedProduct && (
+        <div className="flex flex-col items-center justify-center h-screen">
+          <h2 className="text-2xl font-bold mb-4">Rate Your Purchase</h2>
+          <Card>
+            <CardHeader>
+              <CardTitle>{selectedProduct.name}</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <img src={selectedProduct.image} alt={selectedProduct.name} className="w-full h-48 object-cover mb-4" />
+              <div className="flex justify-center">
+                {[1, 2, 3, 4, 5].map((value) => (
+                  <Star
+                    key={value}
+                    className={`w-8 h-8 cursor-pointer ${value <= rating ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'}`}
+                    onClick={() => handleRating(value)}
+                  />
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {currentScreen === 'confirmation' && (
+        <div className="flex flex-col items-center justify-center h-screen">
+          <h2 className="text-2xl font-bold mb-4">Thank You for Your Rating!</h2>
+          <p className="mb-4">Your rating has been recorded.</p>
+          <Button onClick={() => setCurrentScreen('products')}>Back to Products</Button>
+        </div>
+      )}
     </div>
-  );
+  )
 }
