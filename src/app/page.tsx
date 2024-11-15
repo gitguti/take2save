@@ -7,7 +7,6 @@ import { Progress } from "@/components/ui/progress"
 import { Star } from 'lucide-react'
 
 
-
 // Simulated product data
 const products = [
   { id: 1, name: "Laptop", price: 999.99, image: "/placeholder.svg?height=200&width=200" },
@@ -20,11 +19,28 @@ type Product = typeof products[0]
 
 type Screen = 'products' | 'detail' | 'purchase' | 'rating' | 'confirmation'
 
+const RatingParam = ({ label, value, onChange }) => (
+  <div className="flex items-center mb-4">
+    <span className="w-24 font-semibold">{label}:</span>
+    <div className="flex">
+      {[1, 2, 3, 4, 5].map((star) => (
+        <Star 
+          key={star}
+          className={`w-6 h-6 cursor-pointer ${star <= value ? 'text-yellow-400 fill-current' : 'text-gray-300'}`}
+          onClick={() => onChange(star)}  
+        />
+      ))}
+    </div>
+  </div>
+)
+
 export default function App() {
   const [currentScreen, setCurrentScreen] = useState<Screen>('products')
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
   const [purchaseProgress, setPurchaseProgress] = useState(0)
-  const [rating, setRating] = useState(0)
+  const [quality, setQuality] = useState(0)
+  const [speed, setSpeed] = useState(0) 
+  const [service, setService] = useState(0)
 
   
   const selectProduct = (product: Product) => {
@@ -37,12 +53,11 @@ export default function App() {
     setPurchaseProgress(0)
   }
 
-  const handleRating = async (value: number) => {
-    setRating(value)
-    // Here you would typically call your blockchain function
-    // For this example, we'll just simulate a delay
+  const handleSubmit = async (rating) => {
+    console.log('Rating submitted:', rating)
+    // Simulamos un retraso para imitar una solicitud al backend
     await new Promise(resolve => setTimeout(resolve, 1000))
-    setCurrentScreen('confirmation')
+    setCurrentScreen('confirmation') 
   }
 
 
@@ -112,26 +127,24 @@ export default function App() {
         </div>
       )}
         {currentScreen === 'rating' && selectedProduct && (
-        <div className="flex flex-col items-center justify-center h-screen">
-          <h2 className="text-2xl font-bold mb-4">Rate Your Purchase</h2>
-          <Card>
-            <CardHeader>
-              <CardTitle>{selectedProduct.name}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <img src={selectedProduct.image} alt={selectedProduct.name} className="w-full h-48 object-cover mb-4" />
-              <div className="flex justify-center">
-                {[1, 2, 3, 4, 5].map((value) => (
-                  <Star
-                    key={value}
-                    className={`w-8 h-8 cursor-pointer ${value <= rating ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'}`}
-                    onClick={() => handleRating(value)}
-                  />
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+ <div className="flex justify-center mt-8">
+ <Card className="w-96">
+   <CardHeader>
+     <CardTitle>Rate {selectedProduct.name}</CardTitle>  
+   </CardHeader>
+   <CardContent>
+     <RatingParam label="Quality" value={quality} onChange={setQuality} />
+     <RatingParam label="Speed" value={speed} onChange={setSpeed} />
+     <RatingParam label="Service" value={service} onChange={setService} />
+     <button 
+       className="btn btn-primary w-full mt-4"
+       onClick={handleSubmit}
+     >
+       Submit
+     </button>
+   </CardContent>
+ </Card>  
+</div>
       )}
 
       {currentScreen === 'confirmation' && (
