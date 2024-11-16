@@ -5,16 +5,53 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
 import { Star } from 'lucide-react'
-
+import SearchAndCategories from "@/components/SearchAndCategories"
 
 // Simulated product data
 const products = [
-  { id: 1, name: "Laptop", price: 999.99, image: "/placeholder.svg?height=200&width=200" },
-  { id: 2, name: "Smartphone", price: 599.99, image: "/placeholder.svg?height=200&width=200" },
-  { id: 3, name: "Headphones", price: 149.99, image: "/placeholder.svg?height=200&width=200" },
-  { id: 4, name: "Smartwatch", price: 249.99, image: "/placeholder.svg?height=200&width=200" },
-]
-
+  {
+    id: 1,
+    title: "Margherita Pizza",
+    price: 12.99,
+    image: "https://foodish-api.com/images/pizza/pizza64.jpg",
+  },
+  {
+    id: 2,
+    title: "Beef Burger",
+    price: 8.99,
+    image: "https://foodish-api.com/images/burger/burger79.jpg",
+  },
+  {
+    id: 3,
+    title: "Pasta",
+    price: 14.99,
+    image: "https://foodish-api.com/images/pasta/pasta2.jpg",
+  },
+  {
+    id: 4,
+    title: "Dosa",
+    price: 13.99,
+    image: "https://foodish-api.com/images/dosa/dosa41.jpg",
+  },
+  {
+    id: 5,
+    title: "Tortilla",
+    price: 5.99,
+    image: "https://foodish-api.com/images/dosa/dosa38.jpg",
+  },
+  {
+    id: 6,
+    title: "Chicken Tikka Ildy",
+    price: 15.99,
+    image: "https://foodish-api.com/images/idly/idly64.jpg",
+  },
+  {
+    id: 7,
+    title: "Masala",
+    price: 7.99,
+    image: "https://foodish-api.com/images/butter-chicken/butter-chicken13.jpg",
+  }
+];
 type Product = typeof products[0]
 
 type Screen = 'products' | 'detail' | 'purchase' | 'rating' | 'confirmation'
@@ -82,21 +119,25 @@ export default function App() {
     <div className="container mx-auto p-4">
       {currentScreen === 'products' && (
         <div>
+          <SearchAndCategories/>
           <h1 className="text-2xl font-bold mb-4">Our Products</h1>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             {products.map((product) => (
-              <Card key={product.id} className="flex flex-col justify-between">
-                <CardHeader>
-                  <CardTitle>{product.name}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <img src={product.image} alt={product.name} className="w-full h-48 object-cover mb-2" />
-                  <p className="text-lg font-semibold">${product.price.toFixed(2)}</p>
-                </CardContent>
-                <CardFooter>
-                  <Button onClick={() => selectProduct(product)}>View Details</Button>
-                </CardFooter>
-              </Card>
+            <Card key={product.id} className="flex flex-col justify-between">
+            <img src={product.image} alt={product.title} className="w-full h-48 object-cover mb-2" />
+            <CardContent>
+              <CardTitle>{product.title}</CardTitle>
+              <div className="flex items-center space-x-2">
+                <p className="text-lg font-bold">${product.price.toFixed(2)}</p>
+                <p className="text-gray-500 line-through">
+                  ${(product.price * (1 + Math.random() * 0.5)).toFixed(2)}
+                </p>
+              </div>
+            </CardContent>
+            <CardFooter>
+              <Button onClick={() => selectProduct(product)}>View Details</Button>
+            </CardFooter>
+          </Card>
             ))}
           </div>
         </div>
@@ -105,11 +146,9 @@ export default function App() {
         <div>
           <Button onClick={() => setCurrentScreen('products')} className="mb-4">Back to Products</Button>
           <Card>
-            <CardHeader>
-              <CardTitle>{selectedProduct.name}</CardTitle>
-            </CardHeader>
             <CardContent>
-              <img src={selectedProduct.image} alt={selectedProduct.name} className="w-full h-64 object-cover mb-4" />
+              <img src={selectedProduct.image} alt={selectedProduct.title} className="w-full h-64 object-cover mb-4" />
+              <p>{selectedProduct.title}</p>
               <p className="text-xl font-semibold mb-2">${selectedProduct.price.toFixed(2)}</p>
               <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
             </CardContent>
@@ -130,7 +169,7 @@ export default function App() {
  <div className="flex justify-center mt-8">
  <Card className="w-96">
    <CardHeader>
-     <CardTitle>Rate {selectedProduct.name}</CardTitle>  
+     <CardTitle>Rate {selectedProduct.title}</CardTitle>  
    </CardHeader>
    <CardContent>
      <RatingParam label="Quality" value={quality} onChange={setQuality} />
